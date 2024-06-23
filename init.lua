@@ -105,7 +105,7 @@ vim.opt.number = true
 -- vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
+vim.opt.mouse = ''
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -126,7 +126,7 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Keep signcolumn on by default
-vim.opt.signcolumn = 'yes'
+vim.opt.signcolumn = 'no'
 
 -- Decrease update time
 vim.opt.updatetime = 250
@@ -144,6 +144,9 @@ vim.opt.splitbelow = true
 --  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -358,6 +361,21 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          initial_mode = 'normal',
+          layout_config = {
+            width = 0.95, -- Adjust width here (0.9 means 90% of the editor width)
+            height = 0.95, -- Adjust height here (0.9 means 90% of the editor height)
+            preview_cutoff = 120, -- Preview will be hidden for narrow screens
+            horizontal = {
+              preview_width = 0.75, -- Adjust preview width for horizontal layout
+            },
+            vertical = {
+              preview_height = 0.5, -- Adjust preview height for vertical layout
+            },
+          },
+        },
+
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -777,13 +795,14 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    -- 'folke/tokyonight.nvim',
+    'ellisonleao/gruvbox.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'gruvbox'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
