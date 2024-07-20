@@ -759,6 +759,32 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
+  {
+    'chottolabs/kznllm.nvim',
+    dev = true,
+    dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      local kznllm = require 'kznllm'
+      local spec = require 'kznllm.specs.anthropic'
+
+      local function llm_help()
+        kznllm.invoke_llm_buffer_mode({
+          prompt_template = spec.PROMPT_TEMPLATES.HELPFUL_PROMPT,
+        }, spec.make_job)
+      end
+
+      local function llm_replace()
+        kznllm.invoke_llm_replace_mode({
+          prompt_template = spec.PROMPT_TEMPLATES.REPLACE_PROMPT,
+          replace = true,
+        }, spec.make_job)
+      end
+
+      vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_replace, { desc = 'Send current selection to LLM llm_replace' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>K', llm_help, { desc = 'Send current selection to LLM llm_help' })
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
