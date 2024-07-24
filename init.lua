@@ -104,6 +104,14 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.filetype.add {
+  extension = {
+    jinja = 'jinja',
+    jinja2 = 'jinja',
+    j2 = 'jinja',
+  },
+}
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -142,6 +150,18 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua', -- only load on lua files
+    opts = {
+      library = {
+        -- See the configuration section for more details
+        -- Load luvit types when the `vim.uv` word is found
+        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+  { 'Bilal2453/luvit-meta', lazy = true },
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -350,9 +370,9 @@ require('lazy').setup({
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
 
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim', opts = {} },
+      -- -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
+      -- -- used for completion, annotations and signatures of Neovim apis
+      -- { 'folke/neodev.nvim', opts = {} },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -488,6 +508,8 @@ require('lazy').setup({
       local lspconfig = require 'lspconfig'
       lspconfig.gopls.setup {}
       lspconfig.clangd.setup {}
+      lspconfig.ruff.setup {}
+      lspconfig.terraformls.setup {}
       lspconfig.pyright.setup {
         settings = {
           pyright = {
@@ -499,6 +521,7 @@ require('lazy').setup({
         },
       }
       lspconfig.rust_analyzer.setup {}
+      lspconfig.tsserver.setup {}
       -- https://github.com/LuaLS/lua-language-server
       -- https://github.com/luarocks/luarocks/wiki/Download
       lspconfig.lua_ls.setup {
@@ -764,20 +787,25 @@ require('lazy').setup({
     dev = true,
     dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
-    config = function()
+    config = function(self)
       local kznllm = require 'kznllm'
-      local spec = require 'kznllm.specs.anthropic'
+      local spec = require 'kznllm.specs.openai'
 
       local function llm_help()
         kznllm.invoke_llm_buffer_mode({
-          prompt_template = spec.PROMPT_TEMPLATES.HELPFUL_PROMPT,
+          system_prompt_template = self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.BUFFER_MODE_SYSTEM_PROMPT,
+          user_prompt_templates = {
+            self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.BUFFER_MODE_USER_PROMPT,
+          },
         }, spec.make_job)
       end
 
       local function llm_replace()
         kznllm.invoke_llm_replace_mode({
-          prompt_template = spec.PROMPT_TEMPLATES.REPLACE_PROMPT,
-          replace = true,
+          system_prompt_template = self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.REPLACE_MODE_SYSTEM_PROMPT,
+          user_prompt_templates = {
+            self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.REPLACE_MODE_USER_PROMPT,
+          },
         }, spec.make_job)
       end
 
