@@ -789,28 +789,41 @@ require('lazy').setup({
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function(self)
       local kznllm = require 'kznllm'
-      local spec = require 'kznllm.specs.openai'
+      local utils = require 'kznllm.utils'
+      local spec = require 'kznllm.specs.anthropic'
 
-      local function llm_help()
+      utils.TEMPLATE_DIRECTORY = self.dir .. '/templates/'
+
+      local function llm_buffer()
         kznllm.invoke_llm_buffer_mode({
-          system_prompt_template = self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.BUFFER_MODE_SYSTEM_PROMPT,
+          system_prompt_template = spec.PROMPT_TEMPLATES.BUFFER_MODE_SYSTEM_PROMPT,
           user_prompt_templates = {
-            self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.BUFFER_MODE_USER_PROMPT,
+            spec.PROMPT_TEMPLATES.BUFFER_MODE_USER_PROMPT,
+          },
+        }, spec.make_job)
+      end
+
+      local function llm_project()
+        kznllm.invoke_llm_project_mode({
+          system_prompt_template = spec.PROMPT_TEMPLATES.PROJECT_MODE_SYSTEM_PROMPT,
+          user_prompt_templates = {
+            spec.PROMPT_TEMPLATES.PROJECT_MODE_USER_PROMPT,
           },
         }, spec.make_job)
       end
 
       local function llm_replace()
         kznllm.invoke_llm_replace_mode({
-          system_prompt_template = self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.REPLACE_MODE_SYSTEM_PROMPT,
+          system_prompt_template = spec.PROMPT_TEMPLATES.REPLACE_MODE_SYSTEM_PROMPT,
           user_prompt_templates = {
-            self.dir .. '/templates/' .. spec.PROMPT_TEMPLATES.REPLACE_MODE_USER_PROMPT,
+            spec.PROMPT_TEMPLATES.REPLACE_MODE_USER_PROMPT,
           },
         }, spec.make_job)
       end
 
-      vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_replace, { desc = 'Send current selection to LLM llm_replace' })
-      vim.keymap.set({ 'n', 'v' }, '<leader>K', llm_help, { desc = 'Send current selection to LLM llm_help' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_buffer, { desc = 'Send current selection to LLM llm_buffer' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>Kr', llm_replace, { desc = 'Send current selection to LLM llm_replace' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>Kp', llm_project, { desc = 'Send current selection to LLM llm_project' })
     end,
   },
 }, {
