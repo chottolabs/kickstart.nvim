@@ -790,34 +790,28 @@ require('lazy').setup({
     config = function(self)
       local kznllm = require 'kznllm'
       local utils = require 'kznllm.utils'
-      local spec = require 'kznllm.specs.anthropic'
+      local spec = require 'kznllm.specs.openai'
 
       utils.TEMPLATE_DIRECTORY = self.dir .. '/templates/'
 
       local function llm_buffer()
         kznllm.invoke_llm_buffer_mode({
           system_prompt_template = spec.PROMPT_TEMPLATES.BUFFER_MODE_SYSTEM_PROMPT,
-          user_prompt_templates = {
-            spec.PROMPT_TEMPLATES.BUFFER_MODE_USER_PROMPT,
-          },
+          user_prompt_template = spec.PROMPT_TEMPLATES.BUFFER_MODE_USER_PROMPT,
         }, spec.make_job)
       end
 
       local function llm_project()
         kznllm.invoke_llm_project_mode({
           system_prompt_template = spec.PROMPT_TEMPLATES.PROJECT_MODE_SYSTEM_PROMPT,
-          user_prompt_templates = {
-            spec.PROMPT_TEMPLATES.PROJECT_MODE_USER_PROMPT,
-          },
+          user_prompt_template = spec.PROMPT_TEMPLATES.PROJECT_MODE_USER_PROMPT,
         }, spec.make_job)
       end
 
       local function llm_replace()
         kznllm.invoke_llm_replace_mode({
           system_prompt_template = spec.PROMPT_TEMPLATES.REPLACE_MODE_SYSTEM_PROMPT,
-          user_prompt_templates = {
-            spec.PROMPT_TEMPLATES.REPLACE_MODE_USER_PROMPT,
-          },
+          user_prompt_template = spec.PROMPT_TEMPLATES.REPLACE_MODE_USER_PROMPT,
         }, spec.make_job)
       end
 
