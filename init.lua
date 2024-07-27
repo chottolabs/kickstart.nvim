@@ -784,7 +784,7 @@ require('lazy').setup({
       local utils = require 'kznllm.utils'
       local spec = require 'kznllm.specs.openai'
 
-      utils.TEMPLATE_DIRECTORY = self.dir .. '/templates/'
+      utils.TEMPLATE_DIRECTORY = vim.fn.expand(self.dir) .. '/templates/'
 
       local function llm_buffer()
         kznllm.invoke_llm_buffer_mode({
