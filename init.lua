@@ -780,8 +780,6 @@ require('lazy').setup({
   -- { import = 'custom.plugins' },
   {
     'chottolabs/kznllm.nvim',
-    dev = true,
-    dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function(self)
       local kznllm = require 'kznllm'
