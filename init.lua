@@ -499,22 +499,6 @@ require('lazy').setup({
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local lspconfig = require 'lspconfig'
-      lspconfig.gopls.setup {}
-      lspconfig.clangd.setup {}
-      lspconfig.ruff.setup {}
-      lspconfig.terraformls.setup {}
-      lspconfig.pyright.setup {
-        settings = {
-          pyright = {
-            autoImportCompletion = true,
-          },
-          python = {
-            analysis = { autoSearchPaths = true, diagnosticMode = 'openFilesOnly', useLibraryCodeForTypes = true, typeCheckingMode = 'off' },
-          },
-        },
-      }
-      lspconfig.rust_analyzer.setup {}
-      lspconfig.tsserver.setup {}
       -- https://github.com/LuaLS/lua-language-server
       -- https://github.com/luarocks/luarocks/wiki/Download
       lspconfig.lua_ls.setup {
@@ -786,19 +770,27 @@ require('lazy').setup({
       local utils = require 'kznllm.utils'
       local spec = require 'kznllm.specs.openai'
 
+      -- spec.SELECTED_MODEL = { name = 'meta-llama/Meta-Llama-3.1-8B-Instruct', max_tokens = 8192 }
+      -- spec.URL = 'http://research.local:8000/v1/chat/completions'
+      -- spec.API_KEY_NAME = 'VLLM_API_KEY'
+
+      spec.SELECTED_MODEL = { name = 'hermes-3-llama-3.1-405b-fp8', max_tokens = 131072 }
+      spec.API_KEY_NAME = 'LAMBDA_LABS_API_KEY'
+      spec.URL = 'https://api.lambdalabs.com/v1/chat/completions'
+
       utils.TEMPLATE_DIRECTORY = vim.fn.expand(self.dir) .. '/templates/'
 
       local function llm_buffer()
         kznllm.invoke_llm_buffer_mode({
-          system_prompt_template = spec.PROMPT_TEMPLATES.BUFFER_MODE_SYSTEM_PROMPT,
-          user_prompt_template = spec.PROMPT_TEMPLATES.BUFFER_MODE_USER_PROMPT,
+          system_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.BUFFER_MODE_SYSTEM_PROMPT,
+          user_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.BUFFER_MODE_USER_PROMPT,
         }, spec.make_job)
       end
 
       local function llm_project()
         kznllm.invoke_llm_project_mode({
-          system_prompt_template = spec.PROMPT_TEMPLATES.PROJECT_MODE_SYSTEM_PROMPT,
-          user_prompt_template = spec.PROMPT_TEMPLATES.PROJECT_MODE_USER_PROMPT,
+          system_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.PROJECT_MODE_SYSTEM_PROMPT,
+          user_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.PROJECT_MODE_USER_PROMPT,
         }, spec.make_job)
       end
 
