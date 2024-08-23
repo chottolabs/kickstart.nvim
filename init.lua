@@ -195,6 +195,7 @@ require('lazy').setup({
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
+    enabled = false,
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
       local wk = require 'which-key'
@@ -499,6 +500,18 @@ require('lazy').setup({
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local lspconfig = require 'lspconfig'
+      lspconfig.zls.setup {}
+      lspconfig.ruff.setup {}
+      lspconfig.pyright.setup {
+        settings = {
+          pyright = {
+            autoImportCompletion = true,
+          },
+          python = {
+            analysis = { autoSearchPaths = true, diagnosticMode = 'openFilesOnly', useLibraryCodeForTypes = true, typeCheckingMode = 'off' },
+          },
+        },
+      }
       -- https://github.com/LuaLS/lua-language-server
       -- https://github.com/luarocks/luarocks/wiki/Download
       lspconfig.lua_ls.setup {
@@ -702,8 +715,8 @@ require('lazy').setup({
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
+      -- - sd'   - [S]urround [D]elete [']quotes - sr)'  - [S]urround [R]eplace [)] [']
+
       require('mini.surround').setup()
 
       -- Simple and easy statusline.
@@ -880,9 +893,9 @@ require('lazy').setup({
           -- Width of the code block background:
           --  block: width of the code block
           --  full:  full width of the window
-          width = 'block',
+          width = 'full',
           -- Amount of padding to add to the left of code blocks
-          left_pad = 1,
+          left_pad = 0,
           -- Amount of padding to add to the right of code blocks when width is 'block'
           right_pad = 2,
           -- Minimum width to use for code blocks when width is 'block'
@@ -1061,48 +1074,39 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
+
   {
     'chottolabs/kznllm.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim' },
+    dev = true,
+    dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
+    dependencies = {
+      { 'nvim-lua/plenary.nvim' },
+    },
     config = function(self)
       local kznllm = require 'kznllm'
-      local utils = require 'kznllm.utils'
-      local spec = require 'kznllm.specs.openai'
+      local spec = require 'kznllm.specs.anthropic'
 
-      -- spec.SELECTED_MODEL = { name = 'meta-llama/Meta-Llama-3.1-8B-Instruct', max_tokens = 8192 }
-      -- spec.URL = 'http://research.local:8000/v1/chat/completions'
-      -- spec.API_KEY_NAME = 'VLLM_API_KEY'
+      -- falls back to `vim.fn.stdpath 'data' .. '/lazy/kznllm/templates'` when the plugin is not locally installed
+      kznllm.TEMPLATE_DIRECTORY = vim.fn.expand(self.dir) .. '/templates/'
 
-      spec.SELECTED_MODEL = { name = 'hermes-3-llama-3.1-405b-fp8', max_tokens = 131072 }
-      spec.API_KEY_NAME = 'LAMBDA_LABS_API_KEY'
-      spec.URL = 'https://api.lambdalabs.com/v1/chat/completions'
-
-      utils.TEMPLATE_DIRECTORY = vim.fn.expand(self.dir) .. '/templates/'
-
-      local function llm_buffer()
-        kznllm.invoke_llm_buffer_mode({
-          system_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.BUFFER_MODE_SYSTEM_PROMPT,
-          user_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.BUFFER_MODE_USER_PROMPT,
+      local function llm_fill()
+        kznllm.invoke_llm({
+          { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_SYSTEM_PROMPT },
+          { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_USER_PROMPT },
         }, spec.make_job)
       end
 
-      local function llm_project()
-        kznllm.invoke_llm_project_mode({
-          system_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.PROJECT_MODE_SYSTEM_PROMPT,
-          user_prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.PROJECT_MODE_USER_PROMPT,
-        }, spec.make_job)
+      vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_fill, { desc = 'Send current selection to LLM llm_fill' })
+
+      -- optional for debugging purposes
+      local function debug()
+        kznllm.invoke_llm({
+          { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_SYSTEM_PROMPT },
+          { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_USER_PROMPT },
+        }, spec.make_job, { debug = true })
       end
 
-      local function llm_replace()
-        kznllm.invoke_llm_replace_mode({
-          system_prompt_template = spec.PROMPT_TEMPLATES.REPLACE_MODE_SYSTEM_PROMPT,
-          user_prompt_template = spec.PROMPT_TEMPLATES.REPLACE_MODE_USER_PROMPT,
-        }, spec.make_job)
-      end
-
-      vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_buffer, { desc = 'Send current selection to LLM llm_buffer' })
-      vim.keymap.set({ 'n', 'v' }, '<leader>Kr', llm_replace, { desc = 'Send current selection to LLM llm_replace' })
-      vim.keymap.set({ 'n', 'v' }, '<leader>Kp', llm_project, { desc = 'Send current selection to LLM llm_project' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>d', debug, { desc = 'Send current selection to LLM debug' })
     end,
   },
 }, {
