@@ -195,7 +195,7 @@ require('lazy').setup({
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
-    enabled = false,
+    enabled = true,
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
       local wk = require 'which-key'
@@ -501,6 +501,8 @@ require('lazy').setup({
 
       local lspconfig = require 'lspconfig'
       lspconfig.zls.setup {}
+      lspconfig.astro.setup {}
+      lspconfig.tsserver.setup {}
       lspconfig.ruff.setup {}
       lspconfig.pyright.setup {
         settings = {
@@ -742,7 +744,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'astro' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -802,7 +804,6 @@ require('lazy').setup({
 
         (thematic_break) @dash
 
-        (fenced_code_block) @code
 
         [
             (list_marker_plus)
@@ -894,20 +895,21 @@ require('lazy').setup({
           --  block: width of the code block
           --  full:  full width of the window
           width = 'full',
+
           -- Amount of padding to add to the left of code blocks
           left_pad = 0,
           -- Amount of padding to add to the right of code blocks when width is 'block'
           right_pad = 2,
           -- Minimum width to use for code blocks when width is 'block'
           min_width = 0,
-          -- Determins how the top / bottom of code block are rendered:
-          --  thick: use the same highlight as the code body
-          --  thin:  when lines are empty overlay the above & below icons
-          border = 'thin',
-          -- Used above code blocks for thin border
-          above = '▄',
-          -- Used below code blocks for thin border
-          below = '▀',
+          -- -- Determins how the top / bottom of code block are rendered:
+          -- --  thick: use the same highlight as the code body
+          -- --  thin:  when lines are empty overlay the above & below icons
+          -- border = 'thin',
+          -- -- Used above code blocks for thin border
+          -- above = '▄',
+          -- -- Used below code blocks for thin border
+          -- below = '▀',
           -- Highlight for code blocks
           highlight = 'RenderMarkdownCode',
           -- Highlight for inline code
@@ -1076,11 +1078,22 @@ require('lazy').setup({
   -- { import = 'custom.plugins' },
 
   {
-    'chottolabs/kznllm.nvim',
+    'supermaven-inc/supermaven-nvim',
     dev = true,
-    dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
+    dir = '$HOME/.config/nvim/plugins/supermaven-nvim',
+    config = function()
+      local function enable()
+        require('supermaven-nvim').setup {}
+      end
+      vim.keymap.set('n', '<leader>sm', enable, { desc = '[s]uper[m]aven' })
+    end,
+  },
+  {
+    'chottolabs/kznllm.nvim',
+    -- dev = true,
+    -- dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
     dependencies = {
-      { 'nvim-lua/plenary.nvim' },
+      { 'chottolabs/plenary.nvim' },
     },
     config = function(self)
       local kznllm = require 'kznllm'
@@ -1089,8 +1102,15 @@ require('lazy').setup({
       -- falls back to `vim.fn.stdpath 'data' .. '/lazy/kznllm/templates'` when the plugin is not locally installed
       kznllm.TEMPLATE_DIRECTORY = vim.fn.expand(self.dir) .. '/templates/'
 
+      -- spec.SELECTED_MODEL = { name = 'hermes-3-llama-3.1-405b-fp8' }
+      -- spec.API_KEY_NAME = 'LAMBDA_API_KEY'
+      -- spec.URL = 'https://api.lambdalabs.com/v1/chat/completions'
+
       local function llm_fill()
         kznllm.invoke_llm({
+          -- the first template must be for the system prompt when using anthropic
+          -- { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.FILL_MODE_SYSTEM_PROMPT },
+          -- { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.FILL_MODE_USER_PROMPT },
           { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_SYSTEM_PROMPT },
           { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_USER_PROMPT },
         }, spec.make_job)
