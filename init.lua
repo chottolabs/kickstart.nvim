@@ -16,7 +16,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = ''
+vim.opt.mouse = 'n'
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -40,7 +40,7 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Keep signcolumn on by default
-vim.opt.signcolumn = 'no'
+vim.opt.signcolumn = 'yes'
 
 -- Decrease update time
 vim.opt.updatetime = 250
@@ -150,8 +150,115 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  -- {
+  --   'mfussenegger/nvim-dap',
+  --   dependencies = {
+  --     'rcarriga/nvim-dap-ui',
+  --     'leoluz/nvim-dap-go',
+  --     'nvim-neotest/nvim-nio',
+  --     'mfussenegger/nvim-dap-python',
+  --   },
+  --   config = function()
+  --     local dap = require 'dap'
+  --     local ui = require 'dapui'
+  --     require('dapui').setup()
+  --     require('dap-go').setup()
+  --     require('dap-python').setup 'python'
+  --
+  --     dap.adapters.codelldb = {
+  --       type = 'server',
+  --       port = '${port}',
+  --       executable = {
+  --         command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb',
+  --         args = { '--port', '${port}' },
+  --       },
+  --     }
+  --
+  --     table.insert(dap.configurations.python, {
+  --       name = 'Launch justMyCode = false',
+  --       type = 'python',
+  --       request = 'launch',
+  --       program = '${file}',
+  --       justMyCode = false,
+  --     })
+  --
+  --     dap.configurations.zig = {
+  --       {
+  --         name = 'Launch (default)',
+  --         type = 'codelldb',
+  --         request = 'launch',
+  --         program = '${workspaceFolder}/zig-out/bin/main',
+  --         cwd = '${workspaceFolder}',
+  --         stopOnEntry = false,
+  --         args = {},
+  --       },
+  --     }
+  --
+  --     table.insert(dap.configurations.zig, {
+  --       name = 'Launch (by name)',
+  --       type = 'codelldb',
+  --       request = 'launch',
+  --       program = function()
+  --         return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/zig-out/bin/', 'file')
+  --       end,
+  --       cwd = '${workspaceFolder}',
+  --       stopOnEntry = false,
+  --       args = {},
+  --     })
+  --
+  --     dap.configurations.c = {
+  --       {
+  --         name = 'Launch',
+  --         type = 'codelldb',
+  --         request = 'launch',
+  --         program = function()
+  --           return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+  --         end,
+  --         -- program = function()
+  --         --   return '${workspaceFolder}/build/bin/' .. vim.fn.input 'name of file: '
+  --         -- end,
+  --         cwd = '${workspaceFolder}',
+  --         stopOnEntry = false,
+  --         args = {},
+  --       },
+  --     }
+  --
+  --     vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint)
+  --     vim.keymap.set('n', '<leader>cb', dap.toggle_breakpoint)
+  --     vim.keymap.set('n', '<leader>gb', dap.run_to_cursor)
+  --     vim.keymap.set('n', '<leader>tb', function()
+  --       dap.disconnect { terminateDebuggee = true }
+  --     end)
+  --
+  --     vim.keymap.set('n', '<leader>?', function()
+  --       require('dapui').eval(nil, { enter = true })
+  --     end)
+  --
+  --     vim.keymap.set('n', '<F1>', dap.continue)
+  --     vim.keymap.set('n', '<F2>', dap.step_over)
+  --     vim.keymap.set('n', '<F3>', dap.step_into)
+  --     vim.keymap.set('n', '<F4>', dap.step_out)
+  --     vim.keymap.set('n', '<F5>', dap.clear_breakpoints)
+  --     vim.keymap.set('n', '<F12>', dap.restart)
+  --
+  --     dap.listeners.before.attach.dapui_config = function()
+  --       ui.open()
+  --     end
+  --     dap.listeners.before.launch.dapui_config = function()
+  --       ui.open()
+  --     end
+  --     dap.listeners.before.event_terminated.dapui_config = function()
+  --       ui.close()
+  --     end
+  --     dap.listeners.before.event_exited.dapui_config = function()
+  --       ui.close()
+  --     end
+  --   end,
+  -- },
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  'mbbill/undotree',
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -195,7 +302,7 @@ require('lazy').setup({
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
-    enabled = true,
+    enabled = false,
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup {
@@ -859,294 +966,13 @@ require('lazy').setup({
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
     config = function()
       require('render-markdown').setup {
-        -- Whether Markdown should be rendered by default or not
-        enabled = true,
-        -- Maximum file size (in MB) that this plugin will attempt to render
-        -- Any file larger than this will effectively be ignored
-        max_file_size = 10.0,
-        -- Milliseconds that must pass before updating marks, updates occur
-        -- within the context of the visible window, not the entire buffer
-        debounce = 100,
-        -- Pre configured settings that will attempt to mimic various target
-        -- user experiences. Any user provided settings will take precedence.
-        --  obsidian: mimic Obsidian UI
-        --  lazy:     will attempt to stay up to date with LazyVim configuration
-        --  none:     does nothing
-        preset = 'none',
-        -- Capture groups that get pulled from markdown
-        markdown_query = [[
-        (atx_heading [
-            (atx_h1_marker)
-            (atx_h2_marker)
-            (atx_h3_marker)
-            (atx_h4_marker)
-            (atx_h5_marker)
-            (atx_h6_marker)
-        ] @heading)
-
-        (thematic_break) @dash
-
-
-        [
-            (list_marker_plus)
-            (list_marker_minus)
-            (list_marker_star)
-        ] @list_marker
-
-        (task_list_marker_unchecked) @checkbox_unchecked
-        (task_list_marker_checked) @checkbox_checked
-
-        (block_quote) @quote
-
-        (pipe_table) @table
-    ]],
-        -- Capture groups that get pulled from quote nodes
-        markdown_quote_query = [[
-        [
-            (block_quote_marker)
-            (block_continuation)
-        ] @quote_marker
-    ]],
-        -- Capture groups that get pulled from inline markdown
-        inline_query = [[
-        (code_span) @code
-
-        (shortcut_link) @shortcut
-
-        [(inline_link) (full_reference_link) (image)] @link
-    ]],
-        -- The level of logs to write to file: vim.fn.stdpath('state') .. '/render-markdown.log'
-        -- Only intended to be used for plugin development / debugging
-        log_level = 'error',
-        -- Filetypes this plugin will run on
-        file_types = { 'markdown' },
-        -- Vim modes that will show a rendered view of the markdown file
-        -- All other modes will be uneffected by this plugin
-        render_modes = { 'n', 'c' },
-        -- Set to avoid seeing warnings for conflicts in health check
-        acknowledge_conflicts = false,
-        anti_conceal = {
-          -- This enables hiding any added text on the line the cursor is on
-          enabled = true,
-          -- Number of lines above cursor to show
-          above = 0,
-          -- Number of lines below cursor to show
-          below = 0,
-        },
-        latex = {
-          -- Whether LaTeX should be rendered, mainly used for health check
-          enabled = false,
-          -- Executable used to convert latex formula to rendered unicode
-          converter = 'latex2text',
-          -- Highlight for LaTeX blocks
-          highlight = 'RenderMarkdownMath',
-          -- Amount of empty lines above LaTeX blocks
-          top_pad = 0,
-          -- Amount of empty lines below LaTeX blocks
-          bottom_pad = 0,
-        },
-        heading = {
-          -- Turn on / off heading icon & background rendering
-          enabled = false,
-          -- Turn on / off any sign column related rendering
-          sign = false,
-          -- Determines how the icon fills the available space:
-          --  inline:  underlying '#'s are concealed resulting in a left aligned icon
-          --  overlay: result is left padded with spaces to hide any additional '#'
-          position = 'overlay',
-        },
-        code = {
-          -- Turn on / off code block & inline code rendering
-          enabled = true,
-          -- Turn on / off any sign column related rendering
-          sign = true,
-          -- Determines how code blocks & inline code are rendered:
-          --  none:     disables all rendering
-          --  normal:   adds highlight group to code blocks & inline code, adds padding to code blocks
-          --  language: adds language icon to sign column if enabled and icon + name above code blocks
-          --  full:     normal + language
-          style = 'full',
-          -- Determines where language icon is rendered:
-          --  right: right side of code block
-          --  left:  left side of code block
-          position = 'left',
-          -- An array of language names for which background highlighting will be disabled
-          -- Likely because that language has background highlights itself
-          disable_background = { 'diff' },
-          -- Width of the code block background:
-          --  block: width of the code block
-          --  full:  full width of the window
-          width = 'full',
-
-          -- Amount of padding to add to the left of code blocks
-          left_pad = 0,
-          -- Amount of padding to add to the right of code blocks when width is 'block'
-          right_pad = 2,
-          -- Minimum width to use for code blocks when width is 'block'
-          min_width = 0,
-          -- -- Determins how the top / bottom of code block are rendered:
-          -- --  thick: use the same highlight as the code body
-          -- --  thin:  when lines are empty overlay the above & below icons
-          -- border = 'thin',
-          -- -- Used above code blocks for thin border
-          -- above = '▄',
-          -- -- Used below code blocks for thin border
-          -- below = '▀',
-          -- Highlight for code blocks
-          highlight = 'RenderMarkdownCode',
-          -- Highlight for inline code
-          highlight_inline = 'RenderMarkdownCodeInline',
-        },
-        dash = {
-          -- Turn on / off thematic break rendering
-          enabled = true,
-          -- Replaces '---'|'***'|'___'|'* * *' of 'thematic_break'
-          -- The icon gets repeated across the window's width
-          icon = '─',
-          -- Width of the generated line:
-          --  <integer>: a hard coded width value
-          --  full:      full width of the window
-          width = 'full',
-          -- Highlight for the whole line generated from the icon
-          highlight = 'RenderMarkdownDash',
-        },
-        bullet = {
-          -- Turn on / off list bullet rendering
-          enabled = true,
-          -- Replaces '-'|'+'|'*' of 'list_item'
-          -- How deeply nested the list is determines the 'level'
-          -- The 'level' is used to index into the array using a cycle
-          -- If the item is a 'checkbox' a conceal is used to hide the bullet instead
-          icons = { '●', '○', '◆', '◇' },
-          -- Padding to add to the left of bullet point
-          left_pad = 0,
-          -- Padding to add to the right of bullet point
-          right_pad = 0,
-          -- Highlight for the bullet icon
-          highlight = 'RenderMarkdownBullet',
-        },
-        -- Checkboxes are a special instance of a 'list_item' that start with a 'shortcut_link'
-        -- There are two special states for unchecked & checked defined in the markdown grammar
-        checkbox = {
-          -- Turn on / off checkbox state rendering
-          enabled = true,
-          unchecked = {
-            -- Replaces '[ ]' of 'task_list_marker_unchecked'
-            icon = '󰄱 ',
-            -- Highlight for the unchecked icon
-            highlight = 'RenderMarkdownUnchecked',
-          },
-          checked = {
-            -- Replaces '[x]' of 'task_list_marker_checked'
-            icon = '󰱒 ',
-            -- Highligh for the checked icon
-            highlight = 'RenderMarkdownChecked',
-          },
-          -- Define custom checkbox states, more involved as they are not part of the markdown grammar
-          -- As a result this requires neovim >= 0.10.0 since it relies on 'inline' extmarks
-          -- Can specify as many additional states as you like following the 'todo' pattern below
-          --   The key in this case 'todo' is for healthcheck and to allow users to change its values
-          --   'raw':       Matched against the raw text of a 'shortcut_link'
-          --   'rendered':  Replaces the 'raw' value when rendering
-          --   'highlight': Highlight for the 'rendered' icon
-          custom = {
-            todo = { raw = '[-]', rendered = '󰥔 ', highlight = 'RenderMarkdownTodo' },
-          },
-        },
-        quote = {
-          -- Turn on / off block quote & callout rendering
-          enabled = true,
-          -- Replaces '>' of 'block_quote'
-          icon = '▋',
-          -- Whether to repeat icon on wrapped lines. Requires neovim >= 0.10. This will obscure text if
-          -- not configured correctly with :h 'showbreak', :h 'breakindent' and :h 'breakindentopt'. A
-          -- combination of these that is likely to work is showbreak = '  ' (2 spaces), breakindent = true,
-          -- breakindentopt = '' (empty string). These values are not validated by this plugin. If you want
-          -- to avoid adding these to your main configuration then set them in win_options for this plugin.
-          repeat_linebreak = false,
-          -- Highlight for the quote icon
-          highlight = 'RenderMarkdownQuote',
-        },
-        pipe_table = {
-          -- Turn on / off pipe table rendering
-          enabled = true,
-          -- Pre configured settings largely for setting table border easier
-          --  heavy:  use thicker border characters
-          --  double: use double line border characters
-          --  round:  use round border corners
-          --  none:   does nothing
-          preset = 'none',
-          -- Determines how the table as a whole is rendered:
-          --  none:   disables all rendering
-          --  normal: applies the 'cell' style rendering to each row of the table
-          --  full:   normal + a top & bottom line that fill out the table when lengths match
-          style = 'full',
-          -- Determines how individual cells of a table are rendered:
-          --  overlay: writes completely over the table, removing conceal behavior and highlights
-          --  raw:     replaces only the '|' characters in each row, leaving the cells unmodified
-          --  padded:  raw + cells are padded with inline extmarks to make up for any concealed text
-          cell = 'padded',
-          -- Gets placed in delimiter row for each column, position is based on alignmnet
-          alignment_indicator = '━',
-        -- Characters used to replace table border
-        -- Correspond to top(3), delimiter(3), bottom(3), vertical, & horizontal
-        -- stylua: ignore
-        border = {
-            '┌', '┬', '┐',
-            '├', '┼', '┤',
-            '└', '┴', '┘',
-            '│', '─',
-        },
-          -- Highlight for table heading, delimiter, and the line above
-          head = 'RenderMarkdownTableHead',
-          -- Highlight for everything else, main table rows and the line below
-          row = 'RenderMarkdownTableRow',
-          -- Highlight for inline padding used to add back concealed space
-          filler = 'RenderMarkdownTableFill',
-        },
         link = {
           -- Turn on / off inline link icon rendering
           enabled = false,
         },
-        sign = {
-          -- Turn on / off sign rendering
+        heading = {
           enabled = false,
-          -- Applies to background of sign text
-          highlight = 'RenderMarkdownSign',
         },
-        -- Window options to use that change between rendered and raw view
-        win_options = {
-          -- See :h 'conceallevel'
-          conceallevel = {
-            -- Used when not being rendered, get user setting
-            default = vim.api.nvim_get_option_value('conceallevel', {}),
-            -- Used when being rendered, concealed text is completely hidden
-            rendered = 3,
-          },
-          -- See :h 'concealcursor'
-          concealcursor = {
-            -- Used when not being rendered, get user setting
-            default = vim.api.nvim_get_option_value('concealcursor', {}),
-            -- Used when being rendered, disable concealing text in all modes
-            rendered = '',
-          },
-        },
-        -- More granular configuration mechanism, allows different aspects of buffers
-        -- to have their own behavior. Values default to the top level configuration
-        -- if no override is provided. Supports the following fields:
-        --   enabled, max_file_size, debounce, render_modes, anti_conceal, heading, code,
-        --   dash, bullet, checkbox, quote, pipe_table, callout, link, sign, win_options
-        overrides = {
-          -- Overrides for different buftypes, see :h 'buftype'
-          buftype = {
-            nofile = {
-              sign = { enabled = false },
-            },
-          },
-        },
-        -- Mapping from treesitter language to user defined handlers
-        -- See 'Custom Handlers' document for more info
-        custom_handlers = {},
       }
     end,
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
@@ -1159,17 +985,17 @@ require('lazy').setup({
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
 
-  {
-    'supermaven-inc/supermaven-nvim',
-    dev = true,
-    dir = '$HOME/.config/nvim/plugins/supermaven-nvim',
-    config = function()
-      local function enable()
-        require('supermaven-nvim').setup {}
-      end
-      vim.keymap.set('n', '<leader>sm', enable, { desc = '[s]uper[m]aven' })
-    end,
-  },
+  -- {
+  --   'supermaven-inc/supermaven-nvim',
+  --   dev = true,
+  --   dir = '$HOME/.config/nvim/plugins/supermaven-nvim',
+  --   config = function()
+  --     local function enable()
+  --       require('supermaven-nvim').setup {}
+  --     end
+  --     vim.keymap.set('n', '<leader>sm', enable, { desc = '[s]uper[m]aven' })
+  --   end,
+  -- },
   {
     'chottolabs/kznllm.nvim',
     -- dev = true,
@@ -1178,37 +1004,86 @@ require('lazy').setup({
       { 'chottolabs/plenary.nvim' },
     },
     config = function(self)
-      local kznllm = require 'kznllm'
-      local spec = require 'kznllm.specs.anthropic'
+      local presets = require 'kznllm.presets'
+      local Path = require 'plenary.path'
 
       -- falls back to `vim.fn.stdpath 'data' .. '/lazy/kznllm/templates'` when the plugin is not locally installed
-      kznllm.TEMPLATE_DIRECTORY = vim.fn.expand(self.dir) .. '/templates/'
+      local TEMPLATE_DIRECTORY = Path:new(vim.fn.expand(self.dir) .. '/templates')
 
-      -- spec.SELECTED_MODEL = { name = 'hermes-3-llama-3.1-405b-fp8' }
-      -- spec.API_KEY_NAME = 'LAMBDA_API_KEY'
-      -- spec.URL = 'https://api.lambdalabs.com/v1/chat/completions'
+      local SELECTED_PRESET = presets[5]
+      local spec = require(('kznllm.specs.%s'):format(SELECTED_PRESET.provider))
+
+      local function switch_presets()
+        table.sort(presets, function(a, _)
+          return a == SELECTED_PRESET
+        end)
+        vim.ui.select(presets, {
+          format_item = function(item)
+            local options = {}
+            for k, v in pairs(item.opts.data_params or {}) do
+              if type(v) == 'number' then
+                local k_parts = {}
+                local k_split = vim.split(k, '_')
+                for i, term in ipairs(k_split) do
+                  if i > 1 then
+                    table.insert(k_parts, term:sub(0, 3))
+                  else
+                    table.insert(k_parts, term:sub(0, 4))
+                  end
+                end
+                table.insert(options, ('%-5s %-5s'):format(table.concat(k_parts, '_'), v))
+              end
+            end
+            table.sort(options)
+            return ('%-20s %10s | %s'):format(item.id, item.provider, table.concat(options, ' '))
+          end,
+        }, function(choice)
+          if not choice then
+            return
+          end
+          spec = require(('kznllm.specs.%s'):format(choice.provider))
+          SELECTED_PRESET = choice
+          print(('%-15s provider: %-10s'):format(choice.id, choice.provider))
+        end)
+      end
+
+      vim.keymap.set({ 'n', 'v' }, '<leader>m', switch_presets, { desc = 'switch between presets' })
 
       local function llm_fill()
-        kznllm.invoke_llm({
-          -- the first template must be for the system prompt when using anthropic
-          -- { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.FILL_MODE_SYSTEM_PROMPT },
-          -- { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.NOUS_RESEARCH.FILL_MODE_USER_PROMPT },
-          { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_SYSTEM_PROMPT },
-          { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_USER_PROMPT },
-        }, spec.make_job)
+        presets.invoke_llm(
+          SELECTED_PRESET.make_data_fn,
+          spec.make_curl_args,
+          spec.make_job,
+          vim.tbl_extend('keep', SELECTED_PRESET.opts, {
+            template_directory = TEMPLATE_DIRECTORY,
+          })
+        )
       end
 
       vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_fill, { desc = 'Send current selection to LLM llm_fill' })
 
       -- optional for debugging purposes
       local function debug()
-        kznllm.invoke_llm({
-          { role = 'system', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_SYSTEM_PROMPT },
-          { role = 'user', prompt_template = spec.PROMPT_TEMPLATES.FILL_MODE_USER_PROMPT },
-        }, spec.make_job, { debug = true })
+        presets.invoke_llm(
+          SELECTED_PRESET.make_data_fn,
+          spec.make_curl_args,
+          spec.make_job,
+          vim.tbl_extend('keep', SELECTED_PRESET.opts, {
+            template_directory = TEMPLATE_DIRECTORY,
+            debug = true,
+          })
+        )
       end
 
       vim.keymap.set({ 'n', 'v' }, '<leader>d', debug, { desc = 'Send current selection to LLM debug' })
+
+      vim.api.nvim_set_keymap('n', '<Esc>', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+          vim.api.nvim_exec_autocmds('User', { pattern = 'LLM_Escape' })
+        end,
+      })
     end,
   },
 }, {
