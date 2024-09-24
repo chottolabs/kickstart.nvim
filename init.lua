@@ -38,6 +38,7 @@ vim.opt.undofile = true
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
+vim.o.tabstop = 4
 
 -- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
@@ -58,9 +59,6 @@ vim.opt.splitbelow = true
 --  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -182,7 +180,32 @@ require('lazy').setup({
   --       justMyCode = false,
   --     })
   --
+  --     dap.configurations.rust = {
+  --       {
+  --         name = 'Launch (by name)',
+  --         type = 'codelldb',
+  --         request = 'launch',
+  --         program = function()
+  --           return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+  --         end,
+  --         cwd = '${workspaceFolder}',
+  --         stopOnEntry = false,
+  --         args = {},
+  --       },
+  --     }
+  --
   --     dap.configurations.zig = {
+  --       {
+  --         name = 'Launch (by name)',
+  --         type = 'codelldb',
+  --         request = 'launch',
+  --         program = function()
+  --           return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/zig-out/bin/', 'file')
+  --         end,
+  --         cwd = '${workspaceFolder}',
+  --         stopOnEntry = false,
+  --         args = {},
+  --       },
   --       {
   --         name = 'Launch (default)',
   --         type = 'codelldb',
@@ -193,18 +216,6 @@ require('lazy').setup({
   --         args = {},
   --       },
   --     }
-  --
-  --     table.insert(dap.configurations.zig, {
-  --       name = 'Launch (by name)',
-  --       type = 'codelldb',
-  --       request = 'launch',
-  --       program = function()
-  --         return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/zig-out/bin/', 'file')
-  --       end,
-  --       cwd = '${workspaceFolder}',
-  --       stopOnEntry = false,
-  --       args = {},
-  --     })
   --
   --     dap.configurations.c = {
   --       {
@@ -718,6 +729,7 @@ require('lazy').setup({
 
   { -- Autoformat
     'stevearc/conform.nvim',
+    enabled = true,
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
     keys = {
@@ -751,10 +763,10 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        -- python = { 'ruff' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        -- javascript = { 'prettierd', 'prettier', stop_after_first = true },
       },
     },
   },
@@ -936,13 +948,16 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    -- dev = true,
+    -- dir = '$HOME/.config/nvim/plugins/nvim-treesitter',
+    enabled = true,
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'astro' },
       -- Autoinstall languages that are not installed
-      auto_install = true,
+      -- auto_install = true,
       highlight = {
         enable = true,
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
@@ -952,6 +967,7 @@ require('lazy').setup({
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
+    --
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
     --
@@ -962,6 +978,7 @@ require('lazy').setup({
 
   {
     'MeanderingProgrammer/render-markdown.nvim',
+    enabled = true,
     opts = {},
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
     config = function()
@@ -1005,10 +1022,6 @@ require('lazy').setup({
     },
     config = function(self)
       local presets = require 'kznllm.presets'
-      local Path = require 'plenary.path'
-
-      -- falls back to `vim.fn.stdpath 'data' .. '/lazy/kznllm/templates'` when the plugin is not locally installed
-      local TEMPLATE_DIRECTORY = Path:new(vim.fn.expand(self.dir) .. '/templates')
 
       local SELECTED_PRESET = presets[5]
       local spec = require(('kznllm.specs.%s'):format(SELECTED_PRESET.provider))
@@ -1050,14 +1063,7 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 'v' }, '<leader>m', switch_presets, { desc = 'switch between presets' })
 
       local function llm_fill()
-        presets.invoke_llm(
-          SELECTED_PRESET.make_data_fn,
-          spec.make_curl_args,
-          spec.make_job,
-          vim.tbl_extend('keep', SELECTED_PRESET.opts, {
-            template_directory = TEMPLATE_DIRECTORY,
-          })
-        )
+        presets.invoke_llm(SELECTED_PRESET.make_data_fn, spec.make_curl_args, spec.make_job, vim.tbl_extend('keep', SELECTED_PRESET.opts, {}))
       end
 
       vim.keymap.set({ 'n', 'v' }, '<leader>k', llm_fill, { desc = 'Send current selection to LLM llm_fill' })
@@ -1069,7 +1075,6 @@ require('lazy').setup({
           spec.make_curl_args,
           spec.make_job,
           vim.tbl_extend('keep', SELECTED_PRESET.opts, {
-            template_directory = TEMPLATE_DIRECTORY,
             debug = true,
           })
         )
