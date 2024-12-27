@@ -758,13 +758,13 @@ require('lazy').setup {
   },
   {
     'chottolabs/kznllm.nvim',
-    dev = true,
-    dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
+    -- dev = true,
+    -- dir = '$HOME/.config/nvim/plugins/kznllm.nvim',
     dependencies = {
-      { 'nvim-lua/plenary.nvim' },
+      { 'j-hui/fidget.nvim' },
     },
     config = function(self)
-      local presets = require 'kznllm-v3.presets.basic'
+      local presets = require 'kznllm.presets.basic'
 
       vim.keymap.set({ 'n', 'v' }, '<leader>m', function()
         presets.switch_presets(presets.options)
