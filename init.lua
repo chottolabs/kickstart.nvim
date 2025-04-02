@@ -505,7 +505,7 @@ require('lazy').setup {
         {
             'saghen/blink.cmp',
             -- optional: provides snippets for the snippet source
-            dependencies = { 'rafamadriz/friendly-snippets' },
+            -- dependencies = { 'rafamadriz/friendly-snippets' },
 
             -- use a release tag to download pre-built binaries
             version = '1.*',
@@ -688,37 +688,6 @@ require('lazy').setup {
                 },
                 indent = { enable = false, disable = { 'ruby' } },
             },
-        },
-        --
-        -- There are additional nvim-treesitter modules that you can use to interact
-        -- with nvim-treesitter. You should go explore a few and see what interests you:
-        --
-        --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-        --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-        --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-        {
-            'MeanderingProgrammer/render-markdown.nvim',
-            enabled = false,
-            opts = {},
-            dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
-            config = function()
-                require('render-markdown').setup {
-                    link = {
-                        -- Turn on / off inline link icon rendering
-                        enabled = false,
-                    },
-                    heading = {
-                        enabled = false,
-                    },
-                    code = {
-                        highlight = nil,
-                        -- Highlight for inline code
-                        highlight_inline = nil,
-                    },
-                }
-            end,
-            -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-            -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
         },
         {
             'chottolabs/kznllm.nvim',
